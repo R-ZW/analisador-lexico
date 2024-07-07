@@ -6,7 +6,7 @@ def main():
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
     file_name = input("Insira o nome do arquivo que deseja analisar: ")
-    file_path = os.path.join(dir_path, "..", "ts", "tests", file_name)
+    file_path = os.path.join(dir_path, "..", "ts", "test", file_name)
 
     with open(file_path, "r") as file:
         codigo = file.read()

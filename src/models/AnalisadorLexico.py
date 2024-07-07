@@ -1,6 +1,6 @@
 import re
 import models.Symbol as model_symbol
-import models.Row as model_row
+import models.Tokenizador as model_tokenizador
 
 
 class AnalisadorLexico:
@@ -11,14 +11,23 @@ class AnalisadorLexico:
         ]
 
     def le_token(self, codigo):
+        # MOSTRANDO O CÓDIGO FONTE -----------------------------------------
+        print(f"{"CÓDIGO FONTE".center(60, '=')}")
+        print(codigo)
+        print(f"{"".center(60, '=')}")
+        # -----------------------------------------------------------------
+
+        print(f"{"ANÁLISE".center(60, '=')}")
         symbols = self.identificar_symbols_basicos(codigo)
+        if symbols != False:
+            tokenizador = self.limpar_symbols(symbols)
+            valido = tokenizador.identificar_tokens()
 
-        for symbol in symbols:
-            print(symbol)
-        # rows = self.separar_rows(symbols)
+            if valido != False:
+                tokenizador.mostrar_tokens()
 
-        # for row in rows:
-        #     row.identify()
+        print(f"{"".center(60, '=')}")
+
 
     def identificar_symbols_basicos(self, codigo):
         linha = 1
@@ -26,30 +35,25 @@ class AnalisadorLexico:
         symbols = []
         while ponteiro < len(codigo):
             match = None
-            for symbol_name, regex in self.regex_parts:
+            for name, regex in self.regex_parts:
                 match = regex.match(codigo, ponteiro)
                 if match:
                     value = match.group(0)
-                    symbols.append(model_symbol.Symbol(value, symbol_name, linha))
-                    if symbol_name == "NOVA_LINHA":
+                    symbols.append(model_symbol.Symbol(value, name, linha))
+                    if name == "NOVA_LINHA":
                         linha += 1
                     break
             if not match:
-                raise RuntimeError(f"Erro léxico: {codigo[ponteiro]}")
+                print(f"ERRO LÉXICO!!!!! -[ {codigo[ponteiro]} ]- LINHA {linha}")
+                return False
             else:
                 ponteiro = match.end(0)
         return symbols
 
-    def separar_rows(self, symbols_basicos):
-        rows = []
+    def limpar_symbols(self, symbols_basicos):
+        tokenizador = model_tokenizador.Tokenizador()
 
         for symbol in symbols_basicos:
-            row = model_row.Row()
+            tokenizador.symbols.append(symbol)
 
-            if symbol.get_symbol_name() != "NOVA_LINHA":
-                row.symbols.append(symbol)
-            else:
-                rows.append(row)
-                row = model_row.Row()
-
-        return rows
+        return tokenizador
