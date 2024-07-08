@@ -1,11 +1,29 @@
-import { input, closeRL } from '../input';
+// declaracao de variavel inteira
+let var1:number = 1
 
-async function main() {
-    const n1 = await input('n1: ');
-    const n2 = await input('n2: ');
-    const soma:number = parseInt(n1)+parseInt(n2);
+// declaracao de variavel real
+var var2:number = 2.5;
 
-    console.log(`n1 + n2 = ${soma}`);
+// declaracao de variavel logica
+const verdade:boolean = true;
+
+// declaracao de variavel string
+let var3:string = "teste";
+
+//condicional
+if (verdade || var3 == "2" && verdade){
+// impressao
+console.log("Entrou no if");
+console.log(var3)
 }
 
-main();
+// operacoes de atribuicao
+var1++ 
+var1/= 2
+var2+= 4
+var2--
+var3 = "reatribuicao"
+
+//leitura
+var1 = await input("Digite um valor:")
+var2 = await input(texto)

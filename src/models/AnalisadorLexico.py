@@ -12,13 +12,14 @@ class AnalisadorLexico:
 
     def le_token(self, codigo):
         # MOSTRANDO O CÓDIGO FONTE -----------------------------------------
-        print(f"{"CÓDIGO FONTE".center(60, '=')}")
+        print(f"{"CÓDIGO FONTE".center(75, '=')}")
         print(codigo)
-        print(f"{"".center(60, '=')}")
+        print(f"{"".center(75, '=')}")
         # -----------------------------------------------------------------
 
-        print(f"{"ANÁLISE".center(60, '=')}")
+        print(f"{"ANÁLISE".center(75, '=')}")
         symbols = self.identificar_symbols_basicos(codigo)
+
         if symbols != False:
             tokenizador = self.limpar_symbols(symbols)
             valido = tokenizador.identificar_tokens()
@@ -26,28 +27,34 @@ class AnalisadorLexico:
             if valido != False:
                 tokenizador.mostrar_tokens()
 
-        print(f"{"".center(60, '=')}")
+        print(f"{"".center(75, '=')}")
 
 
     def identificar_symbols_basicos(self, codigo):
         linha = 1
         ponteiro = 0
         symbols = []
+
         while ponteiro < len(codigo):
-            match = None
+            correspondencia = None
+
             for name, regex in self.regex_parts:
-                match = regex.match(codigo, ponteiro)
-                if match:
-                    value = match.group(0)
+                correspondencia = regex.match(codigo, ponteiro)
+                
+                if correspondencia:
+                    value = correspondencia.group(0)
                     symbols.append(model_symbol.Symbol(value, name, linha))
                     if name == "NOVA_LINHA":
                         linha += 1
                     break
-            if not match:
+
+            if not correspondencia:
                 print(f"ERRO LÉXICO!!!!! -[ {codigo[ponteiro]} ]- LINHA {linha}")
                 return False
+            
             else:
-                ponteiro = match.end(0)
+                ponteiro = correspondencia.end(0)
+                
         return symbols
 
     def limpar_symbols(self, symbols_basicos):

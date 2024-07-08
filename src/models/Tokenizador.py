@@ -51,9 +51,12 @@ class Tokenizador:
     def identificar_tokens(self):
         for symbol in self.symbols:
             if self.continua:
+
                 self.continua = False
-                if symbol.name != "ESPACO_OU_TAB" and symbol.name != "COMENTARIO":
+
+                if symbol.name != "COMENTARIO" and symbol.name != "NOVA_LINHA":
                     self.symbols_token.append(symbol)
+
                 match symbol.name:
                     case "ESPACO_OU_TAB" | "COMENTARIO":
                         self.continua = True
@@ -75,7 +78,7 @@ class Tokenizador:
                                     continue
 
                             case "await":
-                                if self.estado == INICIAL:
+                                if self.estado == INICIAL or self.estado == ATRIBUICAO_ESPERANDO_VALOR:
                                     self.estado = ESPERANDO_COMANDO_DE_LEITURA
                                     self.continua = True
                                     continue
@@ -102,6 +105,11 @@ class Tokenizador:
                             case "string":
                                 if self.estado == VARIAVEL_TIPO_PENDENTE:                                    
                                     self.estado = VARIAVEL_STRING
+                                    self.continua = True
+                                    continue
+
+                                if self.estado == ATRIBUICAO_ESPERANDO_VALOR:
+                                    self.estado = ESPERANDO_FIM_DE_SENTENCA
                                     self.continua = True
                                     continue
 
@@ -366,6 +374,11 @@ class Tokenizador:
                             self.continua = True
                             continue
 
+                        if self.estado == ATRIBUICAO_ESPERANDO_VALOR:
+                            self.estado = ESPERANDO_FIM_DE_SENTENCA
+                            self.continua = True
+                            continue
+
 
                     case "INT":
                         if self.estado == ESPERANDO_NUMBER:     
@@ -465,9 +478,10 @@ class Tokenizador:
                             continue
 
                     case "PONTO_E_VIRGULA":
-                        if self.estado == ESPERANDO_FIM_DE_SENTENCA:                            
-                            novo_token = model_token.Token(self.token, self.linha, self.symbols_token)
-                            self.tokens.append(novo_token)
+                        if self.estado == ESPERANDO_FIM_DE_SENTENCA:
+                            if self.token != "":
+                                novo_token = model_token.Token(self.token, self.linha, self.symbols_token)
+                                self.tokens.append(novo_token)
                             self.symbols_token = []
                             self.token = ""
                             self.estado = INICIAL
@@ -476,9 +490,10 @@ class Tokenizador:
 
 
                     case "NOVA_LINHA":
-                        if self.estado == ESPERANDO_FIM_DE_SENTENCA:                            
-                            novo_token = model_token.Token(self.token, self.linha, self.symbols_token)
-                            self.tokens.append(novo_token)
+                        if self.estado == ESPERANDO_FIM_DE_SENTENCA:
+                            if self.token != "": 
+                                novo_token = model_token.Token(self.token, self.linha, self.symbols_token)
+                                self.tokens.append(novo_token)
                             self.symbols_token = []
                             self.token = ""
                             self.estado = INICIAL
@@ -490,24 +505,30 @@ class Tokenizador:
                         self.linha += 1
                         continue
             else:
-                print(f"ERRO LÉXICO!!!!!".center(60, '-'))
+                print(f"ERRO LÉXICO!!!!!".center(75, '-'))
                 print(f"ESTADO -> {self.estado}")
-                print("Último símbolo válido:")
+                print(f"LINHA -> {self.linha}")
+                print("ERRO NO SIMBOLO -> ", end="")
                 if len(self.symbols_token) > 0:
                     print(f"{self.symbols_token[len(self.symbols_token)-1]}")
                 else:
                     ultimo_token = self.tokens[len(self.tokens)-1]
                     print(ultimo_token.__dict__())
-                    print(f"{ultimo_token.symbols_token[len(ultimo_token.symbols_token)-2]}")
-                print("".center(60, '-'))
+                    print(f"{ultimo_token.symbols_token[len(ultimo_token.symbols_token)-1]}")
+
+                print("".center(75, '-'))
                 return False
 
     def mostrar_tokens(self):
-        print(f"{"TOKENS".center(60, '-')}")
+        print(f"{"TOKENS".center(75, '-')}")
+
         for token in self.tokens:
-            print(f"LINHA {token.linha} -> {token.token}")
-            print(f"CONTEÚDO: ", end="")
-            print(token.mostrar_conteudo())
+            print(f"|LINHA {token.linha} -> {token.token} |")
+            print(f"|CONTEÚDO: '", end="")
 
+            for symbol in token.symbols_token:
+                print(symbol, end="")
+            print("'|")
+            print(f"{"".center(60, '-')}")
 
-        print(f"{"".center(60, '-')}")
+        print(f"{"".center(75, '-')}")
