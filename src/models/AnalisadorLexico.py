@@ -21,7 +21,7 @@ class AnalisadorLexico:
         symbols = self.identificar_symbols_basicos(codigo)
 
         if symbols != False:
-            tokenizador = self.limpar_symbols(symbols)
+            tokenizador = self.separar_symbols(symbols)
             valido = tokenizador.identificar_tokens()
 
             if valido != False:
@@ -37,27 +37,27 @@ class AnalisadorLexico:
 
         while ponteiro < len(codigo):
             correspondencia = None
-
-            for name, regex in self.regex_parts:
+            for nome_symbol, regex in self.regex_parts:
                 correspondencia = regex.match(codigo, ponteiro)
                 
                 if correspondencia:
-                    value = correspondencia.group(0)
-                    symbols.append(model_symbol.Symbol(value, name, linha))
-                    if name == "NOVA_LINHA":
+                    valor_symbol = correspondencia.group(0)
+                    symbols.append(model_symbol.Symbol(valor_symbol, nome_symbol, linha))
+
+                    if nome_symbol == "NOVA_LINHA":
                         linha += 1
                     break
 
             if not correspondencia:
                 print(f"ERRO LÉXICO!!!!! -[ {codigo[ponteiro]} ]- LINHA {linha}")
                 return False
-            
             else:
                 ponteiro = correspondencia.end(0)
                 
         return symbols
 
-    def limpar_symbols(self, symbols_basicos):
+
+    def separar_symbols(self, symbols_basicos):
         tokenizador = model_tokenizador.Tokenizador()
 
         for symbol in symbols_basicos:

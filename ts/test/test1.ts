@@ -1,3 +1,5 @@
+// TESTE DE CÓDIGO SEM ERROS
+
 // declaracao de variavel inteira
 let var1:number = 1
 
@@ -19,9 +21,11 @@ console.log(var3)
 
 // operacoes de atribuicao
 var1++ 
-var1/= 2
-var2+= 4
 var2--
+var2+= 4
+var2/= 2
+var2*= 3
+var2-= 3
 var3 = "reatribuicao"
 
 //leitura

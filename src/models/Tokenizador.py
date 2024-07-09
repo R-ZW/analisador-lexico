@@ -51,7 +51,6 @@ class Tokenizador:
     def identificar_tokens(self):
         for symbol in self.symbols:
             if self.continua:
-
                 self.continua = False
 
                 if symbol.name != "COMENTARIO" and symbol.name != "NOVA_LINHA":
@@ -155,6 +154,11 @@ class Tokenizador:
 
                         if self.estado == CONDICIONAL_ESPERANDO_VARIAVEL_VALOR:
                             self.estado = CONDICIONAL_ESPERANDO_OPERADOR_PARENTESE_DIREITA
+                            self.continua = True
+                            continue
+
+                        if self.estado == ATRIBUICAO_ESPERANDO_VALOR:
+                            self.estado = ESPERANDO_FIM_DE_SENTENCA
                             self.continua = True
                             continue
 
@@ -518,6 +522,7 @@ class Tokenizador:
 
                 print("".center(75, '-'))
                 return False
+            
 
     def mostrar_tokens(self):
         print(f"{"TOKENS".center(75, '-')}")
